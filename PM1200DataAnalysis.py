@@ -84,6 +84,37 @@ def ECGDecoding(Data):
         PMPar.measureValue[8][1] = temp
         PMPar.measureValue[9][1] = temp
 
+#心电导联状态解析
+def ECGLeadDecoding(Data):
+    V1 = False
+    V2 = False
+    V3 = False
+    V4 = False
+    V5 = False
+    V6 = False
+    LL = False
+    LA = False
+    RA = False
+    if((int(Data[8]+Data[9],16) & 0x01) == 1):
+        V5 = True
+    if((int(Data[8]+Data[9],16) & 0x02) == 2):
+        V4 = True
+    if((int(Data[8]+Data[9],16) & 0x04) == 4):
+        V3 = True
+    if((int(Data[8]+Data[9],16) & 0x08) == 8):
+        V2 = True
+    if((int(Data[8]+Data[9],16) & 0x10) == 16):
+        V1 = True
+    if((int(Data[8]+Data[9],16) & 0x20) == 32):
+        LL = True
+    if((int(Data[8]+Data[9],16) & 0x40) == 64):
+        LA = True
+    if((int(Data[8]+Data[9],16) & 0x80) == 128):
+        RA = True
+    if((int(Data[10]+Data[11],16) & 0x80) == 128):
+        V6 = True
+    return V1, V2, V3, V4, V5, V6, LL, LA, RA
+
 #心电波形解析
 def ECGWave1Decoding(Data):
     Amplitude1   = int(Data[8]  + Data[9],16)

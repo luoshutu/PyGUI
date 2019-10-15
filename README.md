@@ -1,10 +1,6 @@
-# PyGUI
-PyQt5 GUI 设计的学习之路
 
 Project              : PM1200监护仪，通过串口获取设备PM1200上传的血氧、血压、心电、体温等数据，上位机进行数据展示、波形绘制与开关操作。
-
 CreateTime           : 2019.10.1
-
 By                   : luoshutu
 
 Description          :
@@ -21,4 +17,11 @@ UpDateDescription    :
                        2019.10.8
                        血压测量完成后自动改变血压按钮状态。
                        串口错误的异常处理
+
+                       2019.10.10
+                       添加心电导联状态显示。
+                       使用QtDesigner设计UI
+
+                       2019.10.14
                        
+

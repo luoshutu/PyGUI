@@ -11,7 +11,7 @@
 #---By-------------------: luoshutu
 '''
 
-import PM1200Layout as PMLayout
+import PM1200Layout_ui as PMLayout
 import PM1200Parameter as PMPar
 import PM1200Serial as PMSer
 import PM1200DataAnalysis as PMDA
@@ -21,8 +21,6 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
 
 ui                  = ''                    #用户界面
-
-N                   = 1200                  #屏幕上显示的曲线长度
 
 plotSPO2            = ''                    #血氧曲线
 plotResp            = ''
@@ -64,8 +62,7 @@ btnV6_flag          = False
 btnSer_flag         = False
 
 #波形数据更新
-def FigureShow(plotAm, series, plotSeries):
-    global N
+def FigureShow(plotAm, series, plotSeries, N):
     if(len(series) < N):
         series.append(plotAm)
     else:
@@ -97,24 +94,28 @@ def DataDecoding():
                         Amplitude1, Amplitude2, Amplitude3, \
                         AmplitudeaVR, AmplitudeaVL, AmplitudeaVF, \
                         AmplitudeV1 = PMDA.ECGWave1Decoding(Data[i:i+(4+2*dataLength)])
-                        FigureShow(Amplitude1, series1, plot1)
-                        FigureShow(Amplitude2, series2, plot2)
-                        FigureShow(Amplitude3, series3, plot3)
-                        FigureShow(AmplitudeaVR, seriesaVR, plotaVR)
-                        FigureShow(AmplitudeaVL, seriesaVL, plotaVL)
-                        FigureShow(AmplitudeaVF, seriesaVF, plotaVF)
-                        FigureShow(AmplitudeV1, seriesV1, plotV1)
-                    elif(Data[6 + i] == 'f' and Data[7 + i] == '7'):                            #心电波形
+                        FigureShow(Amplitude1, series1, plot1, 1200)
+                        FigureShow(Amplitude2, series2, plot2, 1200)
+                        FigureShow(Amplitude3, series3, plot3, 1200)
+                        FigureShow(AmplitudeaVR, seriesaVR, plotaVR, 1200)
+                        FigureShow(AmplitudeaVL, seriesaVL, plotaVL, 1200)
+                        FigureShow(AmplitudeaVF, seriesaVF, plotaVF, 1200)
+                        FigureShow(AmplitudeV1, seriesV1, plotV1, 1200)
+                    elif(Data[6 + i] == 'f' and Data[7 + i] == '7'):                            #心电波形2
                         AmplitudeV2, AmplitudeV3, AmplitudeV4, AmplitudeV5, \
                         AmplitudeV6 = PMDA.ECGWave2Decoding(Data[i:i+(4+2*dataLength)])
-                        FigureShow(AmplitudeV2, seriesV2, plotV2)
-                        FigureShow(AmplitudeV3, seriesV3, plotV3)
-                        FigureShow(AmplitudeV4, seriesV4, plotV4)
-                        FigureShow(AmplitudeV5, seriesV5, plotV5)
-                        FigureShow(AmplitudeV6, seriesV6, plotV6)
+                        FigureShow(AmplitudeV2, seriesV2, plotV2, 1200)
+                        FigureShow(AmplitudeV3, seriesV3, plotV3, 1200)
+                        FigureShow(AmplitudeV4, seriesV4, plotV4, 1200)
+                        FigureShow(AmplitudeV5, seriesV5, plotV5, 1200)
+                        FigureShow(AmplitudeV6, seriesV6, plotV6, 1200)
                     elif(Data[6 + i] == '0' and Data[7 + i] == '2'):                            #心电参数
                         PMDA.ECGDecoding(Data[i:i+(4+2*dataLength)])
                         ui.TextBrowserUpdate()
+                    elif(Data[6 + i] == 'f' and Data[7 + i] == '6'):                            #心电参数2
+                        V1, V2, V3, V4, V5, V6, LL, LA, \
+                        RA = PMDA.ECGLeadDecoding(Data[i:i+(4+2*dataLength)])
+                        ui.LabelLeadUpdate(V1, V2, V3, V4, V5, V6, LL, LA, RA)
                     elif(Data[6 + i] == '0' and Data[7 + i] == '3'):                            #血压值
                         measureStatus = PMDA.BloodPreDecoding(Data[i:i+(4+2*dataLength)])
                         if(measureStatus):
@@ -129,10 +130,10 @@ def DataDecoding():
                         PMDA.TempDecoding(Data[i:i+(4+2*dataLength)])
                         ui.TextBrowserUpdate()
                     elif(Data[6 + i] == 'f' and Data[7 + i] == 'e'):                            #血氧波形幅值
-                        FigureShow(PMDA.SPO2WaveDecoding(Data[i:i+(4+2*dataLength)]),SPO2Series,plotSPO2)
+                        FigureShow(PMDA.SPO2WaveDecoding(Data[i:i+(4+2*dataLength)]),SPO2Series,plotSPO2, 200)
                         #print("血氧波形数据")
                     elif(Data[6 + i] == 'f' and Data[7 + i] == 'f'):                            #呼吸波形幅值
-                        FigureShow(PMDA.RespWaveDecoding(Data[i:i+(4+2*dataLength)]),respSeries,plotResp)
+                        FigureShow(PMDA.RespWaveDecoding(Data[i:i+(4+2*dataLength)]),respSeries,plotResp, 1200)
                 else:
                     pass
                     #print("数据错误")
@@ -336,16 +337,16 @@ def on_comboBPModel():
     global ui
     BPModel = ui.comboBPModel.currentIndex()
     if(BPModel == 0):
-        ui.spinBoxBP.setValue(170)
         ui.spinBoxBP.setMaximum(300)
+        ui.spinBoxBP.setValue(170)
         print("血压测量的成人模式")
     elif(BPModel == 1):
-        ui.spinBoxBP.setValue(100)
         ui.spinBoxBP.setMaximum(210)
+        ui.spinBoxBP.setValue(100)
         print("血压测量的儿童模式")
     elif(BPModel == 2):
-        ui.spinBoxBP.setValue(70)
         ui.spinBoxBP.setMaximum(140)
+        ui.spinBoxBP.setValue(70)
         print("血压测量的新生儿模式")
 
 #心电测量模式选择
@@ -461,7 +462,7 @@ def plotSetting():
     plotV6 = ui.pwV6.plot()
     plotV6.setPen((0,0,200))
 
-    plotaVF = ui.pwAVF.plot()
+    plotaVF = ui.pwaVF.plot()
     plotaVF.setPen((0,0,200))
 
     plotaVL = ui.pwaVL.plot()
@@ -479,8 +480,10 @@ def main():
     pg.setConfigOption('foreground', 'k')
 
     MainWindow = QtGui.QMainWindow()
-    ui = PMLayout.Ui_MainWindow(MainWindow)
+    ui = PMLayout.Ui_MainWindow()
 
+    ui.setupUi(MainWindow)
+    ui.retranslateUi(MainWindow)
     ui.SettingComponentProperties()                     #设置ui的部件属性和参数
     ui.TextBrowserUpdate()                              #文本参数显示刷新
     signalConnectSlot()                                 #信号与槽函数连接
